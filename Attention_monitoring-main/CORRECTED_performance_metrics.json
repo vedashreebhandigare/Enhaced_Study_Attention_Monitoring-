@@ -1,0 +1,73 @@
+{
+  "drowsiness": {
+    "precision": 0.6810810810810811,
+    "recall": 0.984375,
+    "f1_score": 0.805111821086262,
+    "accuracy": 0.9186666666666666,
+    "specificity": 0.905144694533762,
+    "true_positives": 252,
+    "true_negatives": 1126,
+    "false_positives": 118,
+    "false_negatives": 4
+  },
+  "yawning": {
+    "precision": 0.9296482412060302,
+    "recall": 0.9840425531914894,
+    "f1_score": 0.9560723514211886,
+    "accuracy": 0.9886666666666667,
+    "specificity": 0.989329268292683,
+    "true_positives": 185,
+    "true_negatives": 1298,
+    "false_positives": 14,
+    "false_negatives": 3
+  },
+  "presence": {
+    "precision": 0.9992378048780488,
+    "recall": 0.9739970282317979,
+    "f1_score": 0.9864559819413092,
+    "accuracy": 0.976,
+    "specificity": 0.9935064935064936,
+    "true_positives": 1311,
+    "true_negatives": 153,
+    "false_positives": 1,
+    "false_negatives": 35
+  },
+  "nodding": {
+    "precision": 0.6497175141242938,
+    "recall": 0.9426229508196722,
+    "f1_score": 0.7692307692307693,
+    "accuracy": 0.954,
+    "specificity": 0.9550072568940493,
+    "true_positives": 115,
+    "true_negatives": 1316,
+    "false_positives": 62,
+    "false_negatives": 7
+  },
+  "overall": {
+    "precision": 0.9613365007378613,
+    "recall": 0.9593333333333334,
+    "f1_score": 0.9597114113426457,
+    "accuracy": 0.9593333333333334
+  },
+  "system_performance": {
+    "avg_processing_time_ms": 31.913441097082135,
+    "fps": 31.3347594500372,
+    "memory_usage_mb": 162,
+    "cpu_utilization_percent": 24,
+    "min_processing_time_ms": 25.0,
+    "max_processing_time_ms": 42.36388023305015,
+    "std_processing_time_ms": 2.9118994883889053
+  },
+  "analytics": {
+    "avg_confidence_score": 0.8478021557158338,
+    "confidence_std": 0.15711897454981705,
+    "high_confidence_rate": 0.8373333333333334,
+    "very_high_confidence_rate": 0.5506666666666666,
+    "medium_confidence_rate": 0.029333333333333333,
+    "low_confidence_rate": 0.13333333333333333,
+    "avg_yawn_probability": 0.19453259736743136,
+    "high_yawn_confidence_rate": 0.11133333333333334,
+    "total_test_samples": 1500,
+    "test_duration_seconds": 49.5
+  }
+}

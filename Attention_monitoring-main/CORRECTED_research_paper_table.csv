@@ -1,0 +1,6 @@
+Detection Type,Precision,Recall,F1-Score,Accuracy
+Drowsiness,0.68,0.98,0.81,0.9186666666666666
+Yawn Detection,0.93,0.98,0.96,0.9886666666666667
+Presence,1.0,0.97,0.99,0.976
+Head Nodding,0.65,0.94,0.77,0.954
+Overall,0.96,0.96,0.96,0.9593333333333334

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Analytics - Attention Monitoring</title>
+    <style>
+        :root {
+            --background: #0a0118;
+            --foreground: #ffffff;
+            --primary: #8b5cf6;
+            --secondary: #3b82f6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: rgba(139, 92, 246, 0.2);
+            --card-bg: rgba(139, 92, 246, 0.1);
+            --card-hover: rgba(139, 92, 246, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            color: var(--foreground);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Colonna MT', 'Times New Roman', serif !important;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .session-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .session-info-item {
+            background: rgba(139, 92, 246, 0.15);
+            padding: 12px 25px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .session-info-item .label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .session-info-item .value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);
+            background: var(--card-hover);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin-bottom: 5px;
+        }
+
+        .stat-card .subtext {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Color variations for cards */
+        .stat-card.success { border-left: 4px solid var(--success); }
+        .stat-card.warning { border-left: 4px solid var(--warning); }
+        .stat-card.danger { border-left: 4px solid var(--danger); }
+        .stat-card.info { border-left: 4px solid var(--accent); }
+
+        /* Progress Bars Section */
+        .progress-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .progress-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--foreground);
+        }
+
+        .progress-item {
+            margin-bottom: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .progress-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            transition: width 1.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-bar.success {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .progress-bar.warning {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .progress-bar.danger {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        /* Focus Score Section */
+        .focus-score-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid var(--border);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .focus-score-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--foreground);
+        }
+
+        .focus-score-display {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 20px;
+        }
+
+        .circular-progress {
+            transform: rotate(-90deg);
+        }
+
+        .circular-progress-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 20;
+        }
+
+        .circular-progress-bar {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 20;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 2s ease-out;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+        }
+
+        .focus-message {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .focus-score-display {
+                width: 200px;
+                height: 200px;
+            }
+
+            .score-text {
+                font-size: 3rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading:nth-child(1) { animation-delay: 0.1s; }
+        .loading:nth-child(2) { animation-delay: 0.2s; }
+        .loading:nth-child(3) { animation-delay: 0.3s; }
+        .loading:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Session Analytics</h1>
+            <p class="subtitle">Your Focus Performance Summary</p>
+            <div class="session-info">
+                <div class="session-info-item">
+                    <div class="label">Student</div>
+                    <div class="value">{{ username }}</div>
+                </div>
+                <div class="session-info-item">
+                    <div class="label">Purpose</div>
+                    <div class="value">{{ session_purpose }}</div>
+                </div>
+                <div class="session-info-item">
+                    <div class="label">Duration</div>
+                    <div class="value">{{ duration_minutes }} min</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Focus Score -->
+        <div class="focus-score-section loading">
+            <h2>Overall Focus Score</h2>
+            <div class="focus-score-display">
+                <svg class="circular-progress" width="250" height="250">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="circular-progress-bg" cx="125" cy="125" r="100"></circle>
+                    <circle class="circular-progress-bar" cx="125" cy="125" r="100"
+                            stroke-dasharray="628.3" 
+                            stroke-dashoffset="{{ 628.3 - (628.3 * focus_percentage / 100) }}">
+                    </circle>
+                </svg>
+                <div class="score-text">{{ focus_percentage|int }}%</div>
+            </div>
+            <div class="score-label">Focus Percentage</div>
+            <div class="focus-message">
+                {% if focus_percentage >= 80 %}
+                    🌟 Outstanding Focus! Keep up the excellent work!
+                {% elif focus_percentage >= 60 %}
+                    👍 Good Focus! There's room for improvement.
+                {% elif focus_percentage >= 40 %}
+                    ⚡ Moderate Focus. Try to minimize distractions.
+                {% else %}
+                    💪 Needs Improvement. Let's work on staying focused!
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Statistics Dashboard -->
+        <div class="dashboard">
+            <div class="stat-card success loading">
+                <span class="icon">✅</span>
+                <div class="label">Focused Time</div>
+                <div class="value">{{ focused_time }}</div>
+                <div class="subtext">{{ focus_percentage }}% of session</div>
+            </div>
+
+            <div class="stat-card warning loading">
+                <span class="icon">😴</span>
+                <div class="label">Drowsy Episodes</div>
+                <div class="value">{{ drowsy_count }}</div>
+                <div class="subtext">{{ drowsy_time }} total drowsy time</div>
+            </div>
+
+            <div class="stat-card danger loading">
+                <span class="icon">👀</span>
+                <div class="label">Distractions</div>
+                <div class="value">{{ distraction_count }}</div>
+                <div class="subtext">{{ distracted_time }} away</div>
+            </div>
+
+            <div class="stat-card info loading">
+                <span class="icon">🥱</span>
+                <div class="label">Yawns Detected</div>
+                <div class="value">{{ yawn_count }}</div>
+                <div class="subtext">Fatigue indicator</div>
+            </div>
+        </div>
+
+        <!-- Time Distribution Progress Bars -->
+        <div class="progress-section loading">
+            <h2>⏱️ Time Distribution</h2>
+            
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">🎯 Focused</span>
+                    <span class="progress-value">{{ focus_percentage }}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar success" style="width: {{ focus_percentage }}%"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">😴 Drowsy</span>
+                    <span class="progress-value">{{ drowsy_percentage }}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar warning" style="width: {{ drowsy_percentage }}%"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">👀 Distracted</span>
+                    <span class="progress-value">{{ distraction_percentage }}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar danger" style="width: {{ distraction_percentage }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{{ url_for('download_analytics_pdf') }}" class="btn btn-download">📄 Download PDF</a>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">🏠 Start New Session</a>
+            <a href="{{ url_for('finish_analytics') }}" class="btn btn-secondary">✨ Finish</a>
+        </div>
+    </div>
+
+    <script>
+        // Animate progress bars on load
+        window.addEventListener('load', function() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+
+            // Animate circular progress
+            const circularBar = document.querySelector('.circular-progress-bar');
+            const finalOffset = circularBar.getAttribute('stroke-dashoffset');
+            circularBar.setAttribute('stroke-dashoffset', '628.3');
+            setTimeout(() => {
+                circularBar.setAttribute('stroke-dashoffset', finalOffset);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

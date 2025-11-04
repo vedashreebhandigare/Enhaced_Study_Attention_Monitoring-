@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention Monitoring - Start Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #02103F 0%, #1a2755 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        h1, h2, h3, h4, h5, h6, .header h1, .section-title {
+            font-family: 'Colonna MT', 'Times New Roman', serif !important;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3FEAFD, #0BCDE5);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(180deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3FEAFD;
+            background: white;
+            box-shadow: 0 0 10px rgba(63, 234, 253, 0.2);
+        }
+
+        .file-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f9f9f9;
+            position: relative;
+        }
+
+        .file-upload-area:hover {
+            border-color: #3FEAFD;
+            background: #f0fcff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #3FEAFD;
+            background: #e6fcff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .file-upload-area:hover .upload-icon {
+            color: #3FEAFD;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .selected-files {
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #e6fcff;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-item .file-icon {
+            color: #3FEAFD;
+        }
+
+        .file-item .file-name {
+            flex-grow: 1;
+            font-size: 0.9rem;
+        }
+
+        .file-item .remove-file {
+            color: #f44336;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .start-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #02103F, #1a2755);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(2, 16, 63, 0.4);
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+        }
+
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .start-button:hover::before {
+            left: 100%;
+        }
+
+        .flash-messages {
+            margin: 20px;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .flash-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+
+        .flash-success {
+            background: #f3ebf7;
+            color: #6b3d75;
+            border-left: 4px solid #9B59B6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #9B59B6;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Attention Monitoring System</h1>
+            <p>Start your focused learning session with document support</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message flash-error">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="form-container">
+            <form action="{{ url_for('start_session') }}" method="POST" enctype="multipart/form-data" id="sessionForm">
+                <!-- User Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">👤</span>
+                        Personal Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="username">Your Name *</label>
+                        <input type="text" id="username" name="username" class="form-control" 
+                               placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="session_purpose">Session Purpose</label>
+                        <select id="session_purpose" name="session_purpose" class="form-control">
+                            <option value="study">Study Session</option>
+                            <option value="work">Work/Meeting</option>
+                            <option value="reading">Reading</option>
+                            <option value="research">Research</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="session_duration">Session Duration (minutes)</label>
+                        <input type="number" id="session_duration" name="session_duration" class="form-control" 
+                               placeholder="Enter session duration in minutes" value="30" min="1" max="300" required>
+                        <small style="color: #666; font-size: 0.9rem; margin-top: 5px; display: block;">
+                            💡 Recommended: 25-45 minutes for optimal focus
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Document Upload Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">📁</span>
+                        Upload Documents (Optional)
+                    </h3>
+                    
+                    <div class="file-upload-area" onclick="document.getElementById('documents').click()">
+                        <div class="upload-icon">📎</div>
+                        <div class="upload-text">Click to select files or drag and drop</div>
+                        <div class="upload-hint">Supported: PDF, DOC, DOCX, PPT, PPTX, TXT, Images (Max 16MB each)</div>
+                        <input type="file" id="documents" name="documents" class="file-input" 
+                               multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif">
+                    </div>
+                    
+                    <div class="selected-files" id="selectedFiles"></div>
+                </div>
+
+                <!-- Start Button -->
+                <button type="submit" class="start-button">
+                    🚀 Start Monitoring Session
+                </button>
+            </form>
+
+            <!-- Features Section -->
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">👁️</div>
+                    <div class="feature-title">Eye Tracking</div>
+                    <div class="feature-desc">Real-time attention monitoring</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">😴</div>
+                    <div class="feature-title">Drowsiness Detection</div>
+                    <div class="feature-desc">Alert when you get drowsy</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Session Analytics</div>
+                    <div class="feature-desc">Track your focus patterns</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📁</div>
+                    <div class="feature-title">Document Support</div>
+                    <div class="feature-desc">Upload study materials</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File upload handling
+        const fileInput = document.getElementById('documents');
+        const uploadArea = document.querySelector('.file-upload-area');
+        const selectedFilesDiv = document.getElementById('selectedFiles');
+        let selectedFiles = [];
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop area when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        uploadArea.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFiles, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            handleFiles();
+        }
+
+        function handleFiles() {
+            selectedFiles = Array.from(fileInput.files);
+            displaySelectedFiles();
+        }
+
+        function displaySelectedFiles() {
+            selectedFilesDiv.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">${file.name} (${formatFileSize(file.size)})</span>
+                    <span class="remove-file" onclick="removeFile(${index})">✕</span>
+                `;
+                selectedFilesDiv.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            
+            // Create a new FileList from remaining files
+            const dt = new DataTransfer();
+            selectedFiles.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+            
+            displaySelectedFiles();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form validation
+        document.getElementById('sessionForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                e.preventDefault();
+                alert('Please enter your name to continue.');
+                document.getElementById('username').focus();
+            }
+        });
+
+        // Add some interactive feedback
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
