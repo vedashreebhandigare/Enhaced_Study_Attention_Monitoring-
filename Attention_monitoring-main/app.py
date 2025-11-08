@@ -43,7 +43,8 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx'}
 
 # Configure Gemini AI
-GEMINI_API_KEY = "AIzaSyD3IaCa-CJAHLCDWlOpNDK8SJ4b6-Q0n9s"
+# REPLACED API KEY (per user request) - keep only this line changed
+GEMINI_API_KEY = "AIzaSyAkAsV1w40UIgMlAqk_hUhcCztj_9iHRgM"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # YouTube API Configuration
